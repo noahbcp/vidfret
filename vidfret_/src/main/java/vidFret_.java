@@ -194,8 +194,11 @@ public class vidFret_ implements Command {
             if (acceptorChannel > 0) {
                 acceptorPlane = DatasetUtils.extractPlane(dataset, acceptorChannel, 0, 0);
             } else {
-                // Use donor plane for acceptor background estimation
-                acceptorPlane = DatasetUtils.extractPlane(dataset, donorChannel, 0, 0);
+                // Create dummy acceptor plane filled with 0.0 for background measurement
+                int height = fretPlane.length;
+                int width = fretPlane[0].length;
+                acceptorPlane = new float[height][width];
+                // Leave as 0.0f (default)
             }
             
             background = bgService.measureBackground(fretPlane, donorPlane, acceptorPlane);
