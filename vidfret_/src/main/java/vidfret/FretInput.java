@@ -5,15 +5,11 @@ import net.imagej.axis.Axes;
 
 public class FretInput {
     private Dataset dataset;
-    private Integer donorChannel;
-    private Integer fretChannel;
     private Long startFrame;
     private Long endFrame;
 
     public FretInput(Dataset dataset, Integer donorChannel, Integer fretChannel, Long startFrame, Long endFrame) {
         this.dataset = dataset;
-        this.donorChannel = donorChannel;
-        this.fretChannel = fretChannel;
         this.startFrame = startFrame;
         this.endFrame = endFrame;
     }
