@@ -39,8 +39,8 @@ public class vidFret_ implements Command {
     @Parameter(label = "<html>FRET channel (D<sub>A</sub>)</html>", min = "1", required = true)
     private Integer fretChannel = 2;
 
-    @Parameter(label = "<html>Acceptor channel (A)</html>", min = "1", required = false)
-    private Integer acceptorChannel = 3;
+    @Parameter(label = "<html>Acceptor channel (A)</html>", description = "Set to 0 if not available", min = "0", required = false)
+    private Integer acceptorChannel = 0;
 
     // Frame/Z range
     @Parameter(label = "Start frame", description = "Frame to start analysis from.", min = "1", required = false)
@@ -97,7 +97,7 @@ public class vidFret_ implements Command {
             if (!DatasetUtils.hasChannel(dataset, fretChannel)) {
                 throw new IllegalArgumentException("FRET channel " + fretChannel + " not found");
             }
-            if (!DatasetUtils.hasChannel(dataset, acceptorChannel)) {
+            if (acceptorChannel > 0 && !DatasetUtils.hasChannel(dataset, acceptorChannel)) {
                 throw new IllegalArgumentException("Acceptor channel " + acceptorChannel + " not found");
             }
 
@@ -135,7 +135,20 @@ public class vidFret_ implements Command {
                     // Extract planes
                     float[][] fretPlane = DatasetUtils.extractPlane(dataset, fretChannel, t, z);
                     float[][] donorPlane = DatasetUtils.extractPlane(dataset, donorChannel, t, z);
-                    float[][] acceptorPlane = DatasetUtils.extractPlane(dataset, acceptorChannel, t, z);
+                    float[][] acceptorPlane;
+                    if (acceptorChannel > 0) {
+                        acceptorPlane = DatasetUtils.extractPlane(dataset, acceptorChannel, t, z);
+                    } else {
+                        // Create dummy acceptor plane filled with 1.0
+                        int height = fretPlane.length;
+                        int width = fretPlane[0].length;
+                        acceptorPlane = new float[height][width];
+                        for (int y = 0; y < height; y++) {
+                            for (int x = 0; x < width; x++) {
+                                acceptorPlane[y][x] = 1.0f;
+                            }
+                        }
+                    }
 
                     // Analyze
                     FretAnalysisResult result = analysisService.analyzePlanes(fretPlane, donorPlane, 
@@ -177,7 +190,13 @@ public class vidFret_ implements Command {
             logService.info("Auto-estimating background from image...");
             float[][] fretPlane = DatasetUtils.extractPlane(dataset, fretChannel, 0, 0);
             float[][] donorPlane = DatasetUtils.extractPlane(dataset, donorChannel, 0, 0);
-            float[][] acceptorPlane = DatasetUtils.extractPlane(dataset, acceptorChannel, 0, 0);
+            float[][] acceptorPlane;
+            if (acceptorChannel > 0) {
+                acceptorPlane = DatasetUtils.extractPlane(dataset, acceptorChannel, 0, 0);
+            } else {
+                // Use donor plane for acceptor background estimation
+                acceptorPlane = DatasetUtils.extractPlane(dataset, donorChannel, 0, 0);
+            }
             
             background = bgService.measureBackground(fretPlane, donorPlane, acceptorPlane);
         }
