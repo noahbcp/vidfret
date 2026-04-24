@@ -37,18 +37,20 @@ vidFRET is optimised for headless and scripted use. In ImageJ macros (.ijm):
 
 ```javascript
 run("vidFret",
-    "donor=1 " +
-    "fret=2 " +
-    "acceptor=0 " +
-    "start=1 " +
-    "end=10 " +
-    "gaussian=0.5 " +
-    "background=Auto (5th percentile) " +
-    "manual_donor_bg=0 " +
-    "manual_fret_bg=0 " +
-    "manual_acceptor_bg=0 " +
-    "normalisation=FRET/Donor " +
-    "threshold=1.0");
+    "donorchannel=1 " +
+    "fretchannel=2 " +
+    "acceptorchannel=0 " +
+    "btdonor=0.02" +
+    "btacceptor=0.05" +
+    "startframe=1 " +
+    "endframe=10 " +
+    "gaussiansigma=0.5 " +
+    "backgroundmethod=[Auto (5th percentile)] " +
+    "manualdonorbg=0 " +
+    "manualfretbg=0 " +
+    "manualacceptorbg=0 " +
+    "normalisationchoice=FRET/Donor " +
+    "thresholdfactor=1.0");
 ```
 
 ### Parameters
@@ -56,8 +58,8 @@ run("vidFret",
 - **donor**: Donor channel number (required)
 - **fret**: FRET channel number (required)  
 - **acceptor**: Acceptor channel number (optional, let = 0 if not using acceptor-dependent normalisations)
-- **BTdon**: SBT coefficient for the donor channel (0 = no correction)
-- **BTacc**: SBT coefficient for the acceptor channel (0 = no correction)
+- **BTdonor**: SBT coefficient for the donor channel (0 = no correction)
+- **BTacceptor**: SBT coefficient for the acceptor channel (0 = no correction)
 - **start**: Starting frame number (default: 1)
 - **end**: Ending frame number (default: all frames)
 - **gaussian**: Gaussian smoothing sigma in pixels (0 = no smoothing)
