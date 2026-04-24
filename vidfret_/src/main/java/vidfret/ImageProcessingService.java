@@ -1,5 +1,11 @@
 package vidfret;
 
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.algorithm.gauss3.Gauss3;
+import net.imglib2.img.array.ArrayImgs;
+import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.view.Views;
+
 /**
  * Image processing operations for FRET analysis.
  * Handles smoothing, background subtraction, and other image operations.
@@ -19,30 +25,29 @@ public class ImageProcessingService {
         
         int height = plane.length;
         int width = plane[0].length;
-        float[][] smoothed = new float[height][width];
         
-        // Simple box filter approximation for now
-        // TODO: Replace with proper Gaussian via ImgLib2
-        int radius = (int)Math.ceil(sigma);
-        
+        // Flatten 2D array to 1D for ImgLib2
+        float[] flat = new float[width * height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                float sum = 0;
-                int count = 0;
-                
-                for (int dy = -radius; dy <= radius; dy++) {
-                    for (int dx = -radius; dx <= radius; dx++) {
-                        int ny = y + dy;
-                        int nx = x + dx;
-                        
-                        if (ny >= 0 && ny < height && nx >= 0 && nx < width) {
-                            sum += plane[ny][nx];
-                            count++;
-                        }
-                    }
-                }
-                
-                smoothed[y][x] = sum / count;
+                flat[y * width + x] = plane[y][x];
+            }
+        }
+        
+        // Create ImgLib2 image
+        RandomAccessibleInterval<FloatType> img = ArrayImgs.floats(flat, width, height);
+        
+        // Extend with zero boundary
+        var extended = Views.extendZero(img);
+        
+        // Apply Gaussian blur
+        Gauss3.gauss(new double[]{sigma, sigma}, extended, img);
+        
+        // Copy back to 2D array
+        float[][] smoothed = new float[height][width];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                smoothed[y][x] = img.getAt(x, y).get();
             }
         }
         
