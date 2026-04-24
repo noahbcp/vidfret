@@ -67,10 +67,10 @@ public class vidFret_ implements Command {
     @Parameter(label = "Acceptor background (if manual)", min = "0", required = false)
     private Float manualAcceptorBg = 0.0f;
 
-    @Parameter(label = "Normalization", 
+    @Parameter(label = "normalisation", 
                choices = {"FRET/Donor", "FRET/Acceptor", "FRET/(D*A)", "FRET/sqrt(D*A)", "FRET Efficiency"}, 
                required = false)
-    private String normalizationChoice = "FRET/Donor";
+    private String normalisationChoice = "FRET/Donor";
 
     @Parameter(label = "Threshold factor", description = "Pixels below sqrt(Bg_D*Bg_A)*factor are masked",
                min = "0.1", max = "10.0", required = false)
@@ -205,10 +205,10 @@ public class vidFret_ implements Command {
         }
 
         // Normalize method
-        int normMethod = normalizationChoice.equals("FRET/Donor") ? 0 :
-                       normalizationChoice.equals("FRET/Acceptor") ? 1 :
-                       normalizationChoice.equals("FRET/(D*A)") ? 2 :
-                       normalizationChoice.equals("FRET/sqrt(D*A)") ? 3 : 4;
+        int normMethod = normalisationChoice.equals("FRET/Donor") ? 0 :
+                       normalisationChoice.equals("FRET/Acceptor") ? 1 :
+                       normalisationChoice.equals("FRET/(D*A)") ? 2 :
+                       normalisationChoice.equals("FRET/sqrt(D*A)") ? 3 : 4;
 
         return new FretParams.Builder()
             .donorChannel(donorChannel)
@@ -216,7 +216,7 @@ public class vidFret_ implements Command {
             .acceptorChannel(acceptorChannel)
             .background(background)
             .gaussianSigma(gaussianSigma)
-            .normalizationMethod(normMethod)
+            .normalisationMethod(normMethod)
             .thresholdFactor(thresholdFactor)
             .build();
     }

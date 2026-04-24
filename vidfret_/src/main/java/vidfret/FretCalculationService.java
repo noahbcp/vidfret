@@ -44,7 +44,7 @@ public class FretCalculationService {
      * @param correctedFret Bleed-through corrected FRET
      * @param donorPixel Donor intensity (background already subtracted)
      * @param acceptorPixel Acceptor intensity (background already subtracted)
-     * @param normMethod Normalization method (0-4)
+     * @param normMethod normalisation method (0-4)
      * @return Normalized FRET value
      */
     public float normalize(float correctedFret, float donorPixel, 
@@ -133,7 +133,7 @@ public class FretCalculationService {
                 
                 if (avgDonor > 0 && avgAcceptor > 0) {
                     float corrected = calculateCorrectedFret(fret, donor, acceptor, params);
-                    float normalized = normalize(corrected, donor, acceptor, params.getNormalizationMethod());
+                    float normalized = normalize(corrected, donor, acceptor, params.getnormalisationMethod());
                     
                     correctedFret[y][x] = corrected;
                     normalizedFret[y][x] = normalized;
