@@ -9,12 +9,12 @@
 	</parent>
 
 	<groupId>net.noahbcp</groupId>
-	<artifactId>vidfret_</artifactId>
+	<artifactId>vidfret</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
 
 	<name>vidFRET</name>
 	<description>Quantitative analysis of time-lapse FRET. Inspired by pixFRET.</description>
-	<url>https://imagej.net/vidfret_</url>
+	<url>https://imagej.net/vidfret</url>
 	<inceptionYear>2026</inceptionYear>
 	<organization>
 		<name>noahbcp</name>

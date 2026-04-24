@@ -17,7 +17,7 @@ import org.scijava.ui.UIService;
 import java.io.File;
 
 @Plugin(type = Command.class, menuPath = "Plugins>vidFret")
-public class vidFret_ implements Command {
+public class VidFret implements Command {
     /* Parameters - UI Inputs */
     @Parameter
     private UIService uiService;
@@ -42,7 +42,7 @@ public class vidFret_ implements Command {
     @Parameter(label = "<html>Acceptor channel (A)</html>", description = "Set to 0 if not available", min = "0", required = false)
     private Integer acceptorChannel = 0;
 
-    @Parameter(label = "Donor bleed-through (BTDon)", description = "Startup donor bleed-through coefficient; 0 if not provided", min = "0", required = false)
+    @Parameter(label = "Donor bleed-through (BTDon)", description = "Startup donor bleed-through coefficient; 0 if not provided.", min = "0", required = false)
     private Float btDonor = 0.0f;
 
     @Parameter(label = "Acceptor bleed-through (BTAcc)", description = "Startup acceptor bleed-through coefficient; 0 if not provided", min = "0", required = false)
@@ -458,7 +458,7 @@ public class vidFret_ implements Command {
         ImageJ ij = new ImageJ();
         
         // Try to open test image if it exists
-        File testImg = new File("vidfret_/test-images/testmovie.tiff");
+        File testImg = new File("test-images/testmovie.tiff");
         if (testImg.exists()) {
             Dataset ds = (Dataset) ij.io().open(testImg.getAbsolutePath());
             ij.ui().showUI();
@@ -469,7 +469,7 @@ public class vidFret_ implements Command {
                              " C:" + ds.dimension(Axes.CHANNEL));
             
             // Launch plugin command
-            ij.command().run(vidFret_.class, true);
+            ij.command().run(VidFret.class, true);
         } else {
             System.err.println("Test image not found: " + testImg.getAbsolutePath());
             System.err.println("Place a multi-channel TIFF in vidfret_/test-images/ to test");
