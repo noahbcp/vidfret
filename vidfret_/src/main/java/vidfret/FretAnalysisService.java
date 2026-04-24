@@ -19,61 +19,6 @@ public class FretAnalysisService {
     }
 
     /**
-     * Analyze a single 2D frame.
-     * 
-     * @param dataset Multi-dimensional dataset
-     * @param params FRET parameters (includes channel selection, background, etc.)
-     * @return Analysis result for single frame
-     * @throws IllegalArgumentException if dataset doesn't have required channels
-     */
-    public FretAnalysisResult analyzeFrame(Dataset dataset, FretParams params) {
-        // TODO: Extract 2D planes from dataset using ImageJ2 API
-        // For now, placeholder
-        throw new UnsupportedOperationException("ImageJ2 Dataset integration needed");
-    }
-
-    /**
-     * Analyze complete Z-stack.
-     * 
-     * @param dataset Multi-dimensional dataset with Z dimension
-     * @param zRange Which Z slices to analyze
-     * @param params FRET parameters
-     * @return Array of results, one per Z-slice
-     */
-    public FretAnalysisResult[] analyzeZStack(Dataset dataset, ZRange zRange, FretParams params) {
-        // TODO: Iterate through Z dimension, extract planes, analyze each
-        throw new UnsupportedOperationException("ImageJ2 Dataset integration needed");
-    }
-
-    /**
-     * Analyze time-series of frames.
-     * 
-     * @param dataset Multi-dimensional dataset with TIME dimension
-     * @param timeRange Which frames to analyze
-     * @param params FRET parameters
-     * @return Array of results, one per timepoint
-     */
-    public FretAnalysisResult[] analyzeTimeSeries(Dataset dataset, TimeRange timeRange, FretParams params) {
-        // TODO: Iterate through TIME dimension, extract planes, analyze each
-        throw new UnsupportedOperationException("ImageJ2 Dataset integration needed");
-    }
-
-    /**
-     * Analyze complete 4D dataset (time x Z x Y x X).
-     * 
-     * @param dataset 4D dataset
-     * @param timeRange Frame range to analyze
-     * @param zRange Z-slice range to analyze
-     * @param params FRET parameters
-     * @return 2D array of results [timepoint][zslice]
-     */
-    public FretAnalysisResult[][] analyzeTimeSeries4D(Dataset dataset, TimeRange timeRange, 
-                                                      ZRange zRange, FretParams params) {
-        // TODO: Full 4D iteration
-        throw new UnsupportedOperationException("ImageJ2 Dataset integration needed");
-    }
-
-    /**
      * Analyze pre-extracted 2D planes directly (useful for batch processing).
      * 
      * @param fretPlane 2D array for FRET channel

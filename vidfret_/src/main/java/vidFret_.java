@@ -42,6 +42,12 @@ public class vidFret_ implements Command {
     @Parameter(label = "<html>Acceptor channel (A)</html>", description = "Set to 0 if not available", min = "0", required = false)
     private Integer acceptorChannel = 0;
 
+    @Parameter(label = "Donor bleed-through (BTDon)", description = "Startup donor bleed-through coefficient; 0 if not provided", min = "0", required = false)
+    private Float btDonor = 0.0f;
+
+    @Parameter(label = "Acceptor bleed-through (BTAcc)", description = "Startup acceptor bleed-through coefficient; 0 if not provided", min = "0", required = false)
+    private Float btAcceptor = 0.0f;
+
     // Frame/Z range
     @Parameter(label = "Start frame", description = "Frame to start analysis from.", min = "1", required = false)
     private Long startFrame = (long) 1;
@@ -214,9 +220,11 @@ public class vidFret_ implements Command {
             .donorChannel(donorChannel)
             .fretChannel(fretChannel)
             .acceptorChannel(acceptorChannel)
+            .startupDonorBleedThrough(btDonor)
+            .startupAcceptorBleedThrough(btAcceptor)
             .background(background)
             .gaussianSigma(gaussianSigma)
-            .normalisationMethod(normMethod)
+            .normalizationMethod(normMethod)
             .thresholdFactor(thresholdFactor)
             .build();
     }

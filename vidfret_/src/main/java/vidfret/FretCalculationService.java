@@ -27,11 +27,15 @@ public class FretCalculationService {
                                        float acceptorPixel, FretParams params) {
         float correctedFret = fretPixel;
         
-        // Subtract donor bleed-through
+        // Subtract startup linear bleed-through terms if provided
+        correctedFret -= params.getStartupDonorBleedThrough() * donorPixel;
+        correctedFret -= params.getStartupAcceptorBleedThrough() * acceptorPixel;
+        
+        // Subtract donor bleed-through from fitted model
         correctedFret -= getBleedThrough(donorPixel, params.getDonorModel(), 
                                          params.getDonorBleedThrough());
         
-        // Subtract acceptor bleed-through
+        // Subtract acceptor bleed-through from fitted model
         correctedFret -= getBleedThrough(acceptorPixel, params.getAcceptorModel(), 
                                          params.getAcceptorBleedThrough());
         
@@ -133,7 +137,7 @@ public class FretCalculationService {
                 
                 if (avgDonor > 0 && avgAcceptor > 0) {
                     float corrected = calculateCorrectedFret(fret, donor, acceptor, params);
-                    float normalized = normalize(corrected, donor, acceptor, params.getnormalisationMethod());
+                    float normalized = normalize(corrected, donor, acceptor, params.getNormalizationMethod());
                     
                     correctedFret[y][x] = corrected;
                     normalizedFret[y][x] = normalized;
