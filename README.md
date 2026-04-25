@@ -4,7 +4,7 @@ Quantitative analysis of time-lapse sensitized FRET (Förster Resonance Energy T
 
 ## Overview
 
-vidFRET extends pixFRET's capabilities for multidimensional FRET analysis, with a focus on programmatic and headless usage in ImageJ/Fiji. While pixFRET provides excellent interactive analysis, vidFRET enables automated processing of large datasets, time-series, and complex multidimensional images through scripting and batch processing.
+vidFRET extends pixFRET's capabilities for multidimensional FRET analysis, with a focus on programmatic and headless usage in ImageJ/Fiji. While pixFRET provides excellent interactive analysis, vidFRET facilitates analysis of multidimensional images and plays nicely with scripting and batch processing.
 
 **Spectral bleed through (SBT)**
 vidFRET does not internally facilitate calculation of SBT however correction using known SBT coeffecients is supported.
@@ -22,10 +22,14 @@ Please note, currently only constant SBT values are supported.
 
 ## Installation
 
-1. Download the JAR file from the releases
+1. Download the most recent JAR file from the releases or build it with Maven.
 2. Place in `Fiji.app/plugins/` directory
 3. Restart Fiji
 
+```
+git clone https://github.com/noahbcp/vidfret.git
+mvn package -f "pom.xml"
+```
 ## Usage
 
 ### Interactive Mode
@@ -34,7 +38,8 @@ Run the plugin through Plugins → vidFRET menu. Configure parameters in the dia
 
 ### Programmatic/Macro Usage
 
-vidFRET is optimised for headless and scripted use. In ImageJ macros (.ijm):
+vidFRET is optimised for headless and scripted use. 
+E.g. In ImageJ macros (.ijm):
 
 ```javascript
 run("vidfret",
@@ -73,7 +78,7 @@ run("vidfret",
 - **normalisation**: FRET normalisation method (see below)
 - **thresholdmethod**: Auto-threshold method for masking (Default/Otsu, Mean, Minimum, Triangle)
 
-### normalisation Methods
+### Normalisation Methods
 
 vidFRET supports several FRET normalisation approaches:
 
@@ -99,14 +104,13 @@ For multidimensional inputs, outputs preserve the temporal and spatial dimension
 1. Extract donor, FRET, and acceptor (if available) planes
 2. Apply Gaussian smoothing if specified
 3. Estimate background values
-4. **Generate auto-threshold mask from first frame's donor channel** (Default/Otsu, Mean, Minimum, or Triangle method)
+4. Generate auto-threshold mask from first frame's donor channel (Default/Otsu, Mean, Minimum, or Triangle method)
 5. Apply mask to all channels (pixels below threshold become 0)
 6. Perform bleedthrough correction and normalisation
-7. Generate output images with proper axis labelling
+7. Generate output images (FRET, NFRET).
 
 **Note**: The auto-threshold is calculated once from the first frame and applied consistently across the entire time-series to ensure stable measurements.
 
 ## Citation
 
 If you use vidFRET in your research, please cite both the original [pixFRET work](https://doi.org/10.1002/jemt.20215) and vidFRET.
-
