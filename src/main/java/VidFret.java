@@ -2,7 +2,6 @@ import vidfret.*;
 
 import net.imagej.Dataset;
 import net.imagej.DatasetService;
-import net.imagej.ImageJ;
 import net.imagej.axis.Axes;
 import net.imagej.axis.DefaultLinearAxis;
 import net.imglib2.img.array.ArrayImgs;
@@ -11,10 +10,10 @@ import org.scijava.command.Command;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.app.StatusService;
 import org.scijava.ui.DialogPrompt;
 import org.scijava.ui.UIService;
 
-import java.io.File;
 
 @Plugin(type = Command.class, menuPath = "Plugins>vidFret")
 public class VidFret implements Command {
@@ -27,6 +26,9 @@ public class VidFret implements Command {
 
     @Parameter
     private DatasetService datasetService;
+
+    @Parameter
+    private StatusService statusService;
 
     // Processes currently active image
     @Parameter
@@ -130,8 +132,14 @@ public class VidFret implements Command {
 
             // Process each frame and Z-slice
             logService.info("Starting analysis loop...");
-            int totalFrames = (int) ((tEnd - tStart) * numZSlices);
+            long totalWork = (tEnd - tStart) * numZSlices;
+            int totalFrames = (int) totalWork;
             int processedFrames = 0;
+
+            // Initialize status
+            if (statusService != null) {
+                statusService.showStatus("Starting vidFRET analysis...");
+            }
 
             // Store results for output
             FretAnalysisResult[][][] results = new FretAnalysisResult[(int)(tEnd - tStart)][numZSlices][];
@@ -161,10 +169,15 @@ public class VidFret implements Command {
                                                                              acceptorPlane, params);
 
                     results[(int)(t - tStart)][z] = new FretAnalysisResult[]{result};
-                    
+
                     processedFrames++;
-                    int progress = (processedFrames * 100) / totalFrames;
-                    logService.info("Progress: " + progress + "% (T:" + (t+1) + " Z:" + (z+1) + ")");
+                    if (statusService != null) {
+                        int progress = (processedFrames * 100) / totalFrames;
+                        statusService.showStatus(progress, 100, "vidFRET: " + progress + "% (T:" + (t+1) + " Z:" + (z+1) + ")");
+                    } else {
+                        int progress = (processedFrames * 100) / totalFrames;
+                        logService.info("Progress: " + progress + "% (T:" + (t+1) + " Z:" + (z+1) + ")");
+                    }
                 }
             }
 
@@ -450,29 +463,6 @@ public class VidFret implements Command {
             for (int x = 0; x < width; x++) {
                 flat[offset + y * width + x] = array[y][x];
             }
-        }
-    }
-
-    public static void main(final String... args) throws Exception {
-        // For testing / debugging
-        ImageJ ij = new ImageJ();
-        
-        // Try to open test image if it exists
-        File testImg = new File("test-images/testmovie.tiff");
-        if (testImg.exists()) {
-            Dataset ds = (Dataset) ij.io().open(testImg.getAbsolutePath());
-            ij.ui().showUI();
-            ij.ui().show(ds);
-            System.out.println("Loaded: " + testImg.getAbsolutePath());
-            System.out.println("Dimensions - X:" + ds.dimension(Axes.X) + 
-                             " Y:" + ds.dimension(Axes.Y) + 
-                             " C:" + ds.dimension(Axes.CHANNEL));
-            
-            // Launch plugin command
-            ij.command().run(VidFret.class, true);
-        } else {
-            System.err.println("Test image not found: " + testImg.getAbsolutePath());
-            System.err.println("Place a multi-channel TIFF in vidfret_/test-images/ to test");
         }
     }
 

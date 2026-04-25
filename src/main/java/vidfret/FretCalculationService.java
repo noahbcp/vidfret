@@ -44,17 +44,18 @@ public class FretCalculationService {
 
     /**
      * Calculate normalized/efficiency FRET from corrected values.
-     * 
+     * Negative values are clamped to 0 as they are physically impossible.
+     *
      * @param correctedFret Bleed-through corrected FRET
      * @param donorPixel Donor intensity (background already subtracted)
      * @param acceptorPixel Acceptor intensity (background already subtracted)
      * @param normMethod normalisation method (0-4)
-     * @return Normalized FRET value
+     * @return Normalized FRET value (clamped to 0 if negative)
      */
-    public float normalize(float correctedFret, float donorPixel, 
+    public float normalize(float correctedFret, float donorPixel,
                           float acceptorPixel, int normMethod) {
         float normTerm;
-        
+
         switch(normMethod) {
             case 0: // FRET / Donor
                 normTerm = Math.abs(donorPixel);
@@ -70,16 +71,19 @@ public class FretCalculationService {
                 break;
             case 4: // FRET Efficiency: 100 * FRET / (FRET + Donor)
                 normTerm = Math.abs(donorPixel + correctedFret);
-                if (normMethod == 4) {
-                    // Special case for efficiency
-                    return normTerm != 0 ? correctedFret * 100.0f / normTerm : 0;
+                if (normTerm != 0) {
+                    float efficiency = correctedFret * 100.0f / normTerm;
+                    return Math.max(0, efficiency); // Clamp negative to 0
                 }
-                break;
+                return 0;
             default:
                 normTerm = 1.0f;
         }
-        
-        return normTerm != 0 ? correctedFret * 100.0f / normTerm : 0;
+
+        if (normTerm == 0) return 0;
+
+        float normalized = correctedFret * 100.0f / normTerm;
+        return Math.max(0, normalized); // Clamp negative to 0
     }
 
     /**
