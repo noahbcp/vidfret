@@ -18,6 +18,7 @@ Please note, currently only constant SBT values are supported.
 - **Flexible normalisation**: Multiple FRET normalisation methods
 - **Background Correction**: Automatic or manual background estimation
 - **Gaussian Smoothing**: Optional image preprocessing
+- **Auto-thresholding**: Automatic mask generation using various algorithms (Default/Otsu, Mean, Minimum, Triangle)
 
 ## Installation
 
@@ -36,7 +37,7 @@ Run the plugin through Plugins → vidFRET menu. Configure parameters in the dia
 vidFRET is optimised for headless and scripted use. In ImageJ macros (.ijm):
 
 ```javascript
-run("vidFret",
+run("vidfret",
     "donorchannel=1 " +
     "fretchannel=2 " +
     "acceptorchannel=0 " +
@@ -50,7 +51,7 @@ run("vidFret",
     "manualfretbg=0 " +
     "manualacceptorbg=0 " +
     "normalisationchoice=FRET/Donor " +
-    "thresholdfactor=1.0");
+    "thresholdmethod=Default ");
 ```
 
 ### Parameters
@@ -70,7 +71,7 @@ run("vidFret",
 - **manual_fret_bg**: Manual FRET background value (when using manual background)
 - **manual_acceptor_bg**: Manual acceptor background value (when using manual background)
 - **normalisation**: FRET normalisation method (see below)
-- **threshold**: Threshold factor for masking low-signal pixels
+- **thresholdmethod**: Auto-threshold method for masking (Default/Otsu, Mean, Minimum, Triangle)
 
 ### normalisation Methods
 
@@ -82,13 +83,13 @@ vidFRET supports several FRET normalisation approaches:
 - **FRET/sqrt(D*A)**: Raw FRET divided by sqrt(donor × acceptor)
 - **FRET Efficiency**: Calculated FRET efficiency (requires acceptor channel)
 
-When acceptor channel is not available (set to 0), acceptor values are treated as 1.0 in calculations. This results in unchanged results provided the normalisation method use doesn't consider the acceptor channel.
+When acceptor channel is not available (set to 0), acceptor values are treated as 1.0 in calculations. This results in unchanged results provided the normalisation method doesn't consider the acceptor channel.
 
 ## Output
 
 The plugin generates FRET analysis results as new images:
 
-- **FRET Normalized**: Processed FRET image with chosen normalisation
+- **FRET Normalised**: Processed FRET image with chosen normalisation
 - **FRET Corrected**: Background-corrected FRET data
 
 For multidimensional inputs, outputs preserve the temporal and spatial dimensions.
@@ -98,9 +99,12 @@ For multidimensional inputs, outputs preserve the temporal and spatial dimension
 1. Extract donor, FRET, and acceptor (if available) planes
 2. Apply Gaussian smoothing if specified
 3. Estimate background values
-4. Perform bleedthrough correction and normalisation
-5. Apply threshold masking for low-signal regions
-6. Generate output images with proper axis labeling
+4. **Generate auto-threshold mask from first frame's donor channel** (Default/Otsu, Mean, Minimum, or Triangle method)
+5. Apply mask to all channels (pixels below threshold become 0)
+6. Perform bleedthrough correction and normalisation
+7. Generate output images with proper axis labelling
+
+**Note**: The auto-threshold is calculated once from the first frame and applied consistently across the entire time-series to ensure stable measurements.
 
 ## Citation
 

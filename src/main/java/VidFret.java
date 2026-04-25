@@ -75,14 +75,15 @@ public class VidFret implements Command {
     @Parameter(label = "Acceptor background (if manual)", min = "0", required = false)
     private Float manualAcceptorBg = 0.0f;
 
-    @Parameter(label = "normalisation", 
+    @Parameter(label = "Normalisation", 
                choices = {"FRET/Donor", "FRET/Acceptor", "FRET/(D*A)", "FRET/sqrt(D*A)", "FRET Efficiency"}, 
                required = false)
     private String normalisationChoice = "FRET/Donor";
 
-    @Parameter(label = "Threshold factor", description = "Pixels below sqrt(Bg_D*Bg_A)*factor are masked",
-               min = "0.1", max = "10.0", required = false)
-    private Float thresholdFactor = 1.0f;
+    @Parameter(label = "Threshold method", 
+               choices = {"Default (Otsu)", "Mean", "Minimum", "Triangle"}, 
+               required = false)
+    private String thresholdMethod = "Default (Otsu)";
 
     // Main
     @Override
@@ -113,6 +114,7 @@ public class VidFret implements Command {
             FretAnalysisService analysisService = new FretAnalysisService();
             BackgroundService bgService = new BackgroundService();
             ResultsService resultsService = new ResultsService();
+            ImageProcessingService imageProcessingService = new ImageProcessingService();
 
             // Get time range
             long numTimepoints = DatasetUtils.getTimePointCount(dataset);
@@ -130,16 +132,23 @@ public class VidFret implements Command {
                            " Donor:" + params.getBackground().getDonorBackground() +
                            " Acceptor:" + params.getBackground().getAcceptorBackground());
 
-            // Process each frame and Z-slice
-            logService.info("Starting analysis loop...");
-            long totalWork = (tEnd - tStart) * numZSlices;
-            int totalFrames = (int) totalWork;
-            int processedFrames = 0;
-
             // Initialize status
             if (statusService != null) {
                 statusService.showStatus("Starting vidFRET analysis...");
             }
+
+            int totalFrames = (int)((tEnd - tStart) * numZSlices);
+            int processedFrames = 0;
+
+            // Compute auto-threshold mask once from first frame, first Z-slice
+            // This ensures consistent thresholding across the entire time-series
+            logService.info("Computing auto-threshold mask from first frame...");
+            float[][] firstDonorPlane = DatasetUtils.extractPlane(dataset, donorChannel, tStart, 0);
+            float[][] firstDonor_sub = imageProcessingService.subtractBackground(firstDonorPlane, 
+                                                                      params.getBackground().getDonorBackground());
+            float[][] thresholdMask = imageProcessingService.createAutoThresholdMask(firstDonor_sub, 
+                                                                          params.getThresholdMethod());
+            logService.info("Auto-threshold mask computed using method: " + params.getThresholdMethod());
 
             // Store results for output
             FretAnalysisResult[][][] results = new FretAnalysisResult[(int)(tEnd - tStart)][numZSlices][];
@@ -164,9 +173,9 @@ public class VidFret implements Command {
                         }
                     }
 
-                    // Analyze
+                    // Analyze with pre-computed mask
                     FretAnalysisResult result = analysisService.analyzePlanes(fretPlane, donorPlane, 
-                                                                             acceptorPlane, params);
+                                                                             acceptorPlane, params, thresholdMask);
 
                     results[(int)(t - tStart)][z] = new FretAnalysisResult[]{result};
 
@@ -238,7 +247,7 @@ public class VidFret implements Command {
             .background(background)
             .gaussianSigma(gaussianSigma)
             .normalizationMethod(normMethod)
-            .thresholdFactor(thresholdFactor)
+            .thresholdMethod(thresholdMethod)
             .build();
     }
 

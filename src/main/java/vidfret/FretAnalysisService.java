@@ -19,7 +19,48 @@ public class FretAnalysisService {
     }
 
     /**
+     * Analyze pre-extracted 2D planes with a pre-computed mask.
+     * 
+     * @param fretPlane 2D array for FRET channel
+     * @param donorPlane 2D array for Donor channel
+     * @param acceptorPlane 2D array for Acceptor channel
+     * @param params FRET parameters
+     * @param mask Pre-computed binary mask (null = no masking)
+     * @return Analysis result
+     */
+    public FretAnalysisResult analyzePlanes(float[][] fretPlane, float[][] donorPlane,
+                                           float[][] acceptorPlane, FretParams params, float[][] mask) {
+        // Apply background subtraction
+        float bg_fret = params.getBackground().getFretBackground();
+        float bg_donor = params.getBackground().getDonorBackground();
+        float bg_acceptor = params.getBackground().getAcceptorBackground();
+        
+        float[][] fret_sub = imageProcessingService.subtractBackground(fretPlane, bg_fret);
+        float[][] donor_sub = imageProcessingService.subtractBackground(donorPlane, bg_donor);
+        float[][] acceptor_sub = imageProcessingService.subtractBackground(acceptorPlane, bg_acceptor);
+        
+        // Apply pre-computed mask if provided
+        if (mask != null) {
+            fret_sub = imageProcessingService.applyMask(fret_sub, mask);
+            donor_sub = imageProcessingService.applyMask(donor_sub, mask);
+            acceptor_sub = imageProcessingService.applyMask(acceptor_sub, mask);
+        }
+        
+        // Apply smoothing if needed
+        float sigma = params.getGaussianSigma();
+        if (sigma > 0) {
+            fret_sub = imageProcessingService.smoothGaussian(fret_sub, sigma);
+            donor_sub = imageProcessingService.smoothGaussian(donor_sub, sigma);
+            acceptor_sub = imageProcessingService.smoothGaussian(acceptor_sub, sigma);
+        }
+        
+        // Calculate FRET
+        return calculationService.analyzePlane(fret_sub, donor_sub, acceptor_sub, params);
+    }
+
+    /**
      * Analyze pre-extracted 2D planes directly (useful for batch processing).
+     * Auto-threshold mask is computed per-plane.
      * 
      * @param fretPlane 2D array for FRET channel
      * @param donorPlane 2D array for Donor channel
@@ -37,6 +78,12 @@ public class FretAnalysisService {
         float[][] fret_sub = imageProcessingService.subtractBackground(fretPlane, bg_fret);
         float[][] donor_sub = imageProcessingService.subtractBackground(donorPlane, bg_donor);
         float[][] acceptor_sub = imageProcessingService.subtractBackground(acceptorPlane, bg_acceptor);
+        
+        // Apply auto-threshold mask from donor channel
+        float[][] mask = imageProcessingService.createAutoThresholdMask(donor_sub, params.getThresholdMethod());
+        fret_sub = imageProcessingService.applyMask(fret_sub, mask);
+        donor_sub = imageProcessingService.applyMask(donor_sub, mask);
+        acceptor_sub = imageProcessingService.applyMask(acceptor_sub, mask);
         
         // Apply smoothing if needed
         float sigma = params.getGaussianSigma();

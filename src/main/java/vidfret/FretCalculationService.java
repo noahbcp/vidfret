@@ -135,20 +135,11 @@ public class FretCalculationService {
                 float donor = donorPlane[y][x] - bgDonor;
                 float acceptor = acceptorPlane[y][x] - bgAcceptor;
                 
-                // Only compute for pixels above threshold
-                float avgDonor = (donor > bgDonor * params.getThresholdFactor()) ? donor : 0;
-                float avgAcceptor = (acceptor > bgAcceptor * params.getThresholdFactor()) ? acceptor : 0;
+                float corrected = calculateCorrectedFret(fret, donor, acceptor, params);
+                float normalized = normalize(corrected, donor, acceptor, params.getNormalizationMethod());
                 
-                if (avgDonor > 0 && avgAcceptor > 0) {
-                    float corrected = calculateCorrectedFret(fret, donor, acceptor, params);
-                    float normalized = normalize(corrected, donor, acceptor, params.getNormalizationMethod());
-                    
-                    correctedFret[y][x] = corrected;
-                    normalizedFret[y][x] = normalized;
-                } else {
-                    correctedFret[y][x] = 0;
-                    normalizedFret[y][x] = 0;
-                }
+                correctedFret[y][x] = corrected;
+                normalizedFret[y][x] = normalized;
             }
         }
         

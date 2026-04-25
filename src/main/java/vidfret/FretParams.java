@@ -27,7 +27,7 @@ public class FretParams {
     // Processing options
     private final float gaussianSigma;
     private final int normalizationMethod; // 0=FRET/Donor, 1=FRET/Acceptor, 2=FRET/(D*A), 3=FRET/sqrt(D*A), 4=FRET Efficiency
-    private final float thresholdFactor;
+    private final String thresholdMethod; // Auto-threshold method: "Default", "Otsu", "Huang", etc.
 
     private FretParams(Builder builder) {
         this.donorChannel = builder.donorChannel;
@@ -42,7 +42,7 @@ public class FretParams {
         this.startupAcceptorBleedThrough = builder.startupAcceptorBleedThrough;
         this.gaussianSigma = builder.gaussianSigma;
         this.normalizationMethod = builder.normalizationMethod;
-        this.thresholdFactor = builder.thresholdFactor;
+        this.thresholdMethod = builder.thresholdMethod;
     }
 
     // Getters
@@ -58,7 +58,7 @@ public class FretParams {
     public float getStartupAcceptorBleedThrough() { return startupAcceptorBleedThrough; }
     public float getGaussianSigma() { return gaussianSigma; }
     public int getNormalizationMethod() { return normalizationMethod; }
-    public float getThresholdFactor() { return thresholdFactor; }
+    public String getThresholdMethod() { return thresholdMethod; }
 
     // Builder pattern for easier construction
     public static class Builder {
@@ -74,7 +74,7 @@ public class FretParams {
         private float startupAcceptorBleedThrough = 0.0f;
         private float gaussianSigma = 0;
         private int normalizationMethod = 0;
-        private float thresholdFactor = 1.0f;
+        private String thresholdMethod = "Default (Otsu)"; // Default = Otsu
 
         public Builder donorChannel(int ch) { this.donorChannel = ch; return this; }
         public Builder fretChannel(int ch) { this.fretChannel = ch; return this; }
@@ -88,7 +88,7 @@ public class FretParams {
         public Builder background(FretBackground bg) { this.background = bg; return this; }
         public Builder gaussianSigma(float sigma) { this.gaussianSigma = sigma; return this; }
         public Builder normalizationMethod(int method) { this.normalizationMethod = method; return this; }
-        public Builder thresholdFactor(float factor) { this.thresholdFactor = factor; return this; }
+        public Builder thresholdMethod(String method) { this.thresholdMethod = method; return this; }
 
         public FretParams build() {
             return new FretParams(this);
