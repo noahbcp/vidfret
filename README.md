@@ -22,8 +22,8 @@ Please note, currently only constant SBT values are supported.
 
 ## Installation
 
-1. Download the most recent JAR file from the releases or build it with Maven.
-2. Place in `Fiji.app/plugins/` directory
+1. Download the most recent JAR file from the [releases](https://github.com/noahbcp/vidfret/releases) or build it with Maven.
+2. Place the JAR in your `Fiji.app/plugins/` directory
 3. Restart Fiji
 
 ```
@@ -114,3 +114,4 @@ For multidimensional inputs, outputs preserve the temporal and spatial dimension
 ## Citation
 
 If you use vidFRET in your research, please cite both the original [pixFRET work](https://doi.org/10.1002/jemt.20215) and vidFRET.
+See [citation.cff](citation.cff) for more info.
