@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+title: vidFRET
+message: >-
+  If you find vidFRET useful please cite this software and
+  the original pixFRET work:
+  https://doi.org/10.1002/jemt.20215
+type: software
+authors:
+  - given-names: Noah B.C.
+    family-names: Piper
+    orcid: 'https://orcid.org/0000-0003-3711-301X'
+repository-code: 'https://github.com/noahbcp/vidfret'
+license: GPL-3.0
